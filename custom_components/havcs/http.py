@@ -115,7 +115,7 @@ class HavcsAuthorizeView(HomeAssistantView):
         try:
             session = async_get_clientsession(self._hass, verify_ssl=False)
             if not self._flow_id:
-                with async_timeout.timeout(5, loop=self._hass.loop):
+                with async_timeout.timeout(5):
                     response = await session.post(self._ha_url+'/auth/login_flow', json=data)
                 result = await response.json()
                 self._flow_id = result.get('flow_id')
@@ -126,7 +126,7 @@ class HavcsAuthorizeView(HomeAssistantView):
                     'password': password
                 }
 
-                with async_timeout.timeout(5, loop=self._hass.loop):
+                with async_timeout.timeout(5):
                     response = await session.post(self._ha_url+'/auth/login_flow/'+self._flow_id, json=data)
                 result = await response.json()
                 code = result.get('result')
@@ -217,7 +217,7 @@ class HavcsTokenView(HomeAssistantView):
         _LOGGER.debug("[%s][auth] forward request: data = %s", LOGGER_NAME, data)
         try:
             session = async_get_clientsession(self._hass, verify_ssl=False)
-            with async_timeout.timeout(5, loop=self._hass.loop):
+            with async_timeout.timeout(5):
                 response = await session.post(self._token_url, data=data)
         except(asyncio.TimeoutError, aiohttp.ClientError):
             _LOGGER.error("[%s][auth] fail to get token, access %s in local network: timeout", LOGGER_NAME, self._token_url)
@@ -240,7 +240,7 @@ class HavcsTokenView(HomeAssistantView):
                 try:
                     refresh_token_data = {'client_id': data.get('client_id'), 'grant_type': 'refresh_token', 'refresh_token': result.get('refresh_token')}
                     session = async_get_clientsession(self._hass, verify_ssl=False)
-                    with async_timeout.timeout(5, loop=self._hass.loop):
+                    with async_timeout.timeout(5):
                         response = await session.post(self._token_url, data=refresh_token_data)
                 except(asyncio.TimeoutError, aiohttp.ClientError):
                     _LOGGER.error("[%s][auth] fail to get new access token, access %s in local network: timeout", LOGGER_NAME, self._token_url)
@@ -463,7 +463,7 @@ class HavcsHttpManager:
                 self._retry_remove = None
 
             session = async_get_clientsession(self._hass, verify_ssl=False)
-            with async_timeout.timeout(5, loop= self._hass.loop):
+            with async_timeout.timeout(5):
                 response = await session.get(self._ha_url + '/havcs/auth/authorize')
             if response.status == 401:
                 _LOGGER.debug("[%s][check] aouth service is running: url = %s, status = %s", LOGGER_NAME, self._ha_url + '/havcs/auth/authorize', response.status)
