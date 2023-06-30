@@ -61,7 +61,7 @@ class VoiceControllDevice:
 
     async def async_update_device_registry(self):
         """Update device registry."""
-        device_registry = await self.hass.helpers.device_registry.async_get_registry()
+        device_registry = await self.hass.helpers.device_registry.async_get()
         device = device_registry.async_get_or_create(
             config_entry_id=self.config_entry.entry_id,
             connections={('CONNECTION_NETWORK_MAC', self.serial)},
